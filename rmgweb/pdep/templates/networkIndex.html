@@ -65,6 +65,7 @@
 {% if network.inputFileExists %}
 <h2>Species</h2>
 <p>
+<form action="" method="POST">{% csrf_token %}
 <table class="networkData">
 <tr>
     <th>Label</th>
@@ -73,6 +74,7 @@
     <th>Collision model?</th>
     <th>Frequencies?</th>
     <th>Thermodynamics?</th>
+    <th></th>
 </tr>
 {% for label, structure, type, collision, states, thermo in speciesList %}
 <tr>
@@ -82,19 +84,25 @@
     <td>{{ collision }}</td>
     <td>{{ states }}</td>
     <td>{{ thermo }}</td>
+    <td><input type="submit" value="Delete" id="submit" name="delete_species_{{ forloop.counter }}"/></td>
 </tr>
 {% endfor %}
 </table>
+<br/>
+<input type="submit" value="Add species" id="submit" name="add_species"/>
+</form>
 </p>
 
 <h2>Path Reactions</h2>
 <p>
+<form action="" method="POST">{% csrf_token %}
 <table class="networkData">
 <tr>
     <th>Index</th>
     <th colspan="3">Path reaction</th>
     <th>Transition state?</th>
     <th>High-P kinetics?</th>
+    <th></th>
 </tr>
 {% for reactants, arrow, products, states, kinetics in pathReactionList %}
 <tr>
@@ -104,9 +112,13 @@
     <td class="products">{{ products|safe }}</td>
     <td>{{ states }}</td>
     <td>{{ kinetics }}</td>
+    <td><input type="submit" value="Delete" id="submit" name="delete_path_reaction_{{ forloop.counter }}"/></td>
 </tr>
 {% endfor %}
 </table>
+<br/>
+<input type="submit" value="Add path reactions" id="submit" name="add_path_reactions"/>
+</form>
 </p>
 
 {% endif %}
