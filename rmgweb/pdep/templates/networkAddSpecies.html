@@ -1,0 +1,67 @@
+{% extends "pdepbase.html" %}
+
+{% block title %}Add Species to Network{% endblock %}
+
+{% block navbar_items %}
+<a href="{% url pdep.views.index %}">MEASURE</a> &raquo;
+<a href="{% url pdep.views.networkIndex networkKey=networkKey%}">Network {{ networkKey }}</a> &raquo;
+<a href="{% url pdep.views.networkAddSpecies networkKey=networkKey%}">Add Species</a>
+{% endblock %}
+
+{% block sidebar_items %}
+{% endblock %}
+
+{% block page_title %}Add Species to Network {{ network.title }}{% endblock %}
+
+{% block extrahead %}
+<style type="text/css">
+.speciesLabel {
+    width: 15em;
+}
+
+.speciesStructure {
+    width: 25em;
+}
+
+.energyInput {
+    width: 10em;
+}
+</style>
+{% endblock %}
+
+{% block page_body %}
+
+<p>
+Use the form below to add one or more species to the network. You can use
+SMILES, InChI, etc. for the structure fields. If you need additional rows, 
+click the "Add more species" button. Leave extra rows blank.
+</p>
+
+<form action="" method="POST">{% csrf_token %}
+{{ formset.management_form }}
+<table>
+    <tr>
+        <th>Label</th>
+        <th>Structure/Identifier</th>
+        <th>Ground-state energy</th>
+    </tr>
+    {% for form in formset %}
+    <tr>
+        <td>{{ form.label.errors }}</td>
+        <td>{{ form.structure.errors }}</td>
+        <td>{{ form.E0.errors }}</td>
+    </tr>
+    <tr>
+        <td>{{ form.label }}</td>
+        <td>{{ form.structure }}</td>
+        <td>{{ form.E0 }}</td>
+    </tr>
+    {% endfor %}
+    <tr>
+        <td colspan="3"><input type="submit" value="Add more species" id="submit" name="add_species"/></td>
+    </tr>
+</table>
+<p><input type="submit" value="Submit" id="submit"/></p>
+</form>
+
+{% endblock %}

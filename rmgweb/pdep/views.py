@@ -631,6 +631,32 @@ def networkPlotMicro(request, networkKey):
         }, 
         context_instance=RequestContext(request),
     )
+
+def networkAddSpecies(request, networkKey):
+    """
+    A view that provides a form for adding species to a Network.
+    """
+    networkModel = get_object_or_404(Network, pk=networkKey)
+    network = networkModel.load()
+    
+    if request.method == 'POST' and 'add_species' in request.POST:
+        # The user clicked the "Add more species" button
+        post = request.POST.copy()
+        post['form-TOTAL_FORMS'] = int(post['form-TOTAL_FORMS']) + 5
+        formset = AddSpeciesFormSet(post)
+        # The above will still attempt to validate the form, so suppress the errors it generates
+        for form in formset: form._errors = {}
+    elif request.method == 'POST':
+        # The user clicked the "Submit" button
+        formset = AddSpeciesFormSet(request.POST)
+        for form in formset: form.network = network
+        if formset.is_valid():
+            # Go back to the network's main page
+            return HttpResponseRedirect(reverse(networkIndex,args=(networkModel.pk,)))
+    else:
+        # Create the form
+        formset = AddSpeciesFormSet()
+    return render_to_response('networkAddSpecies.html', {'network': network, 'networkKey': networkKey, 'formset': formset}, context_instance=RequestContext(request))
 def networkDeleteSpecies(request, networkKey, species):
     """
     A view that causes a species to be deleted from a Network.

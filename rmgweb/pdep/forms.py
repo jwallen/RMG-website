@@ -33,8 +33,10 @@ This module defines the Django forms used by the pdep app.
 """
 
 from django import forms
+from django.forms.formsets import formset_factory
 
 from models import *
+from rmgweb.main.fields import *
 
 ################################################################################
 
@@ -71,3 +73,30 @@ class PlotKineticsForm(forms.Form):
         super(PlotKineticsForm, self).__init__(*args, **kwargs)
         choices = [(config, config) for config in configurations]
         self.fields['reactant'].choices = choices
+
+################################################################################
+
+class AddSpeciesForm(forms.Form):
+    """
+    A Django form for adding a species to a Network.
+    """
+    label = forms.CharField(widget=forms.TextInput(attrs={'class':'speciesLabel'}))
+    structure = forms.CharField(widget=forms.TextInput(attrs={'class':'speciesStructure'}))
+    E0 = EnergyField()
+    
+    def __init__(self, *args, **kwargs):
+        super(AddSpeciesForm, self).__init__(*args, **kwargs)
+        self.network = None
+        
+    def clean_label(self):
+        """
+        Provides custom validation for the label field. In particular, we
+        want to check that the label is not already in use.
+        """
+        label = self.cleaned_data['label']
+        for species in self.network.getAllSpecies():
+            if species.label == label:
+                raise forms.ValidationError('Label already in use.')
+        return label
+    
+AddSpeciesFormSet = formset_factory(AddSpeciesForm, extra=5)

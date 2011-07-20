@@ -59,6 +59,7 @@ urlpatterns = patterns('rmgweb.pdep',
     (r'^networks/(?P<networkKey>[^/]+)/microdata$', 'views.networkPlotMicro'),
     
     # URLs for adding/editing network information
+    (r'^networks/(?P<networkKey>[^/]+)/add_species$', 'views.networkAddSpecies'),
     (r'^networks/(?P<networkKey>[^/]+)/delete_species/(?P<species>[^/]+)$', 'views.networkDeleteSpecies'),
     (r'^networks/(?P<networkKey>[^/]+)/delete_path_reaction/(?P<reaction>[^/]+)$', 'views.networkDeletePathReaction'),
     
