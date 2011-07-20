@@ -60,5 +60,6 @@ urlpatterns = patterns('rmgweb.pdep',
     
     # URLs for adding/editing network information
     (r'^networks/(?P<networkKey>[^/]+)/delete_species/(?P<species>[^/]+)$', 'views.networkDeleteSpecies'),
+    (r'^networks/(?P<networkKey>[^/]+)/delete_path_reaction/(?P<reaction>[^/]+)$', 'views.networkDeletePathReaction'),
     
 )

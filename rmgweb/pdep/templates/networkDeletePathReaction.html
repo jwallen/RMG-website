@@ -1,0 +1,32 @@
+{% extends "pdepbase.html" %}
+
+{% block title %}Delete Path Reaction from Network{% endblock %}
+
+{% block navbar_items %}
+<a href="{% url pdep.views.index %}">MEASURE</a> &raquo;
+<a href="{% url pdep.views.networkIndex networkKey=networkKey%}">Network {{ networkKey }}</a> &raquo;
+<a href="{% url pdep.views.networkDeletePathReaction networkKey=networkKey reaction=index %}">Delete Path Reaction {{ index }}</a>
+{% endblock %}
+
+{% block sidebar_items %}
+{% endblock %}
+
+{% block page_title %}Delete Path Reaction from Network {{ network.title }}{% endblock %}
+
+{% block extrahead %}
+{% endblock %}
+
+{% block page_body %}
+
+<form action="" method="POST">{% csrf_token %}
+<p>
+Are you sure you wish to delete path reaction "{{ reaction }}" from the network?
+This action cannot be undone.
+</p>
+<p>
+<input type="submit" value="Cancel" id="submit_no" name="no"/>
+<input type="submit" value="Delete reaction" id="submit_yes" name="yes"/>
+</p>
+</form>
+
+{% endblock %}

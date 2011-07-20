@@ -658,3 +658,30 @@ def networkDeleteSpecies(request, networkKey, species):
         
     return render_to_response('networkDeleteSpecies.html', {'network': network, 'networkKey': networkKey, 'species': species}, context_instance=RequestContext(request))
 
+def networkDeletePathReaction(request, networkKey, reaction):
+    """
+    A view that causes a path reaction to be deleted from a Network.
+    """
+    networkModel = get_object_or_404(Network, pk=networkKey)
+    network = networkModel.load()
+    
+    try:
+        index = int(reaction)
+    except ValueError:
+        raise Http404
+    try:
+        reaction = network.pathReactions[index-1]
+    except IndexError:
+        raise Http404
+    
+    if request.method == 'POST':
+        if 'yes' in request.POST:
+            # Delete the path reaction (no undo!)
+            # This does not delete the species in the reaction
+            network.deletePathReaction(reaction)
+            networkModel.saveFile()
+        if 'yes' in request.POST or 'no' in request.POST:
+            # Go back to the network's main page
+            return HttpResponseRedirect(reverse(networkIndex,args=(networkModel.pk,)))
+        
+    return render_to_response('networkDeletePathReaction.html', {'network': network, 'networkKey': networkKey, 'reaction': reaction, 'index': index}, context_instance=RequestContext(request))
