@@ -1,0 +1,77 @@
+{% extends "pdepbase.html" %}
+
+{% block title %}Add Path Reactions to Network{% endblock %}
+
+{% block navbar_items %}
+<a href="{% url pdep.views.index %}">MEASURE</a> &raquo;
+<a href="{% url pdep.views.networkIndex networkKey=networkKey%}">Network {{ networkKey }}</a> &raquo;
+<a href="{% url pdep.views.networkAddPathReactions networkKey=networkKey%}">Add Path Reactions</a>
+{% endblock %}
+
+{% block sidebar_items %}
+{% endblock %}
+
+{% block page_title %}Add Path Reactions to Network {{ network.title }}{% endblock %}
+
+{% block extrahead %}
+<style type="text/css">
+.reactant, .product {
+    width: 10em;
+}
+
+.energyInput {
+    width: 6em;
+}
+</style>
+{% endblock %}
+
+{% block page_body %}
+
+<p>
+Use the form below to add one or more path reactions to the network. If you 
+need additional rows, click the "Add more path reactions" button. Leave extra 
+rows blank.
+</p>
+
+<form action="" method="POST">{% csrf_token %}
+{{ formset.management_form }}
+<table>
+    <tr>
+        <th colspan="3">Reactants</th>
+        <th></th>
+        <th colspan="3">Products</th>
+        <th>Transition-state energy</th>
+    </tr>
+    {% for form in formset %}
+    <tr>
+        <td colspan="8">{{ form.non_field_errors }}</td>
+    </tr>
+    <tr>
+        <td>{{ form.reactant1.errors }}</td>
+        <td></td>
+        <td>{{ form.reactant2.errors }}</td>
+        <td></td>
+        <td>{{ form.product1.errors }}</td>
+        <td></td>
+        <td>{{ form.product2.errors }}</td>
+        <td>{{ form.E0.errors }}</td>
+    </tr>
+    <tr>
+        <td>{{ form.reactant1 }}</td>
+        <td>+</td>
+        <td>{{ form.reactant2 }}</td>
+        <td>&hArr;</td>
+        <td>{{ form.product1 }}</td>
+        <td>+</td>
+        <td>{{ form.product2 }}</td>
+        <td>{{ form.E0 }}</td>
+    </tr>
+    {% endfor %}
+    <tr>
+        <td colspan="3"><input type="submit" value="Add more path reactions" id="submit" name="add_path_reactions"/></td>
+    </tr>
+</table>
+<p><input type="submit" value="Submit" id="submit"/></p>
+</form>
+
+{% endblock %}

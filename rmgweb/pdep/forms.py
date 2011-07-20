@@ -100,3 +100,63 @@ class AddSpeciesForm(forms.Form):
         return label
     
 AddSpeciesFormSet = formset_factory(AddSpeciesForm, extra=5)
+
+################################################################################
+
+class AddPathReactionsForm(forms.Form):
+    """
+    A Django form for adding a species to a Network.
+    """
+    reactant1 = forms.ChoiceField(required=True, choices=[])
+    reactant2 = forms.ChoiceField(required=False, choices=[])
+    product1 = forms.ChoiceField(required=True, choices=[])
+    product2 = forms.ChoiceField(required=False, choices=[])
+    E0 = EnergyField()
+    
+    def __init__(self, *args, **kwargs):
+        super(AddPathReactionsForm, self).__init__(*args, **kwargs)
+        self.network = None
+    
+    def setSpeciesChoices(self, choices):
+        self.fields['reactant1'].choices = choices
+        self.fields['reactant2'].choices = choices
+        self.fields['product1'].choices = choices
+        self.fields['product2'].choices = choices
+    
+    def clean(self):
+        """
+        Provides custom validation for the label field. In particular, we
+        want to check that the reaction does not already exist.
+        """
+        from rmgpy.reaction import Reaction
+        
+        reactants = []; products = []
+        for species in self.network.getAllSpecies():
+            if self.cleaned_data['reactant1'] == species.label:
+                reactants.append(species)
+            if self.cleaned_data['reactant2'] == species.label:
+                reactants.append(species)
+            if self.cleaned_data['product1'] == species.label:
+                products.append(species)
+            if self.cleaned_data['product2'] == species.label:
+                products.append(species)
+        
+        if len(reactants) == len(products) and all([reactant in products for reactant in reactants]) and all([product in reactants for product in products]):
+            raise forms.ValidationError('Reaction has same reactants and products.')
+        
+        reaction = Reaction(reactants=reactants, products=products)
+        if not reaction.isBalanced():
+            raise forms.ValidationError('Reaction is not balanced.')
+        
+        if len(reactants) == len(products) == 2:
+            raise forms.ValidationError('Bimolecular reactions (A + B -> C + D) not allowed.')
+        
+        for rxn in self.network.pathReactions:
+            if rxn.isIsomorphic(reaction):
+                raise forms.ValidationError('Reaction already present in network.')
+        
+        self.cleaned_data['reaction'] = reaction
+        
+        return self.cleaned_data
+    
+AddPathReactionsFormSet = formset_factory(AddPathReactionsForm, extra=5)

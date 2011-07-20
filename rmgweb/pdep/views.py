@@ -657,6 +657,43 @@ def networkAddSpecies(request, networkKey):
         # Create the form
         formset = AddSpeciesFormSet()
     return render_to_response('networkAddSpecies.html', {'network': network, 'networkKey': networkKey, 'formset': formset}, context_instance=RequestContext(request))
+
+def networkAddPathReactions(request, networkKey):
+    """
+    A view that provides a form for adding path reactions to a Network.
+    """
+    networkModel = get_object_or_404(Network, pk=networkKey)
+    network = networkModel.load()
+    
+    speciesChoices = [('', '')]
+    for species in network.getAllSpecies():
+        speciesChoices.append((species.label, species.label))
+    
+    if request.method == 'POST' and 'add_path_reactions' in request.POST:
+        # The user clicked the "Add more species" button
+        post = request.POST.copy()
+        post['form-TOTAL_FORMS'] = int(post['form-TOTAL_FORMS']) + 5
+        formset = AddPathReactionsFormSet(post)
+        for form in formset:
+            form.setSpeciesChoices(speciesChoices)
+        # The above will still attempt to validate the form, so suppress the errors it generates
+        for form in formset: form._errors = {}
+    elif request.method == 'POST':
+        # The user clicked the "Submit" button
+        formset = AddPathReactionsFormSet(request.POST)
+        for form in formset:
+            form.setSpeciesChoices(speciesChoices)
+            form.network = network
+        if formset.is_valid():
+            # Go back to the network's main page
+            return HttpResponseRedirect(reverse(networkIndex,args=(networkModel.pk,)))
+    else:
+        # Create the form
+        formset = AddPathReactionsFormSet()
+        for form in formset:
+            form.setSpeciesChoices(speciesChoices)
+    return render_to_response('networkAddPathReactions.html', {'network': network, 'networkKey': networkKey, 'formset': formset}, context_instance=RequestContext(request))
+
 def networkDeleteSpecies(request, networkKey, species):
     """
     A view that causes a species to be deleted from a Network.
