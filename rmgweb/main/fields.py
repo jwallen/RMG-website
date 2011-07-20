@@ -123,3 +123,22 @@ class NumberUnitsField(forms.MultiValueField):
                 raise forms.ValidationError('A numeric value is required.')
             return (value, units)
         return None
+
+################################################################################
+
+class EnergyField(NumberUnitsField):
+    """
+    A field for specifying an energy value with corresponding units.
+    """
+    
+    def __init__(self, *args, **kwargs):
+        choices = (
+            ('J/mol', 'J/mol'),
+            ('kJ/mol', 'kJ/mol'),
+            ('cal/mol', 'cal/mol'),
+            ('kcal/mol', 'kcal/mol'),
+            ('cm^-1', 'cm^-1'),
+        )
+        super(EnergyField, self).__init__(choices, *args, **kwargs)
+        self.widget.widgets[0].attrs = {'class': 'energyInput'}
+        
