@@ -38,7 +38,6 @@ from django.http import Http404, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 
-
 from rmgweb.main.tools import *
 from models import *
 from forms import *
@@ -73,6 +72,20 @@ def networkIndex(request, networkKey):
     indicated by `networkKey`.
     """
     networkModel = get_object_or_404(Network, pk=networkKey)
+    network = networkModel.load()
+    
+    if request.method == 'POST':
+        species = network.getAllSpecies()
+        if 'add_species' in request.POST:
+            return HttpResponseRedirect(reverse(networkAddSpecies,args=(networkModel.pk,)))
+        elif 'add_path_reactions' in request.POST:
+            return HttpResponseRedirect(reverse(networkAddPathReactions,args=(networkModel.pk,)))
+        for index, spec in enumerate(species):
+            if 'delete_species_{0}'.format(index+1) in request.POST:
+                return HttpResponseRedirect(reverse(networkDeleteSpecies,args=(networkModel.pk,spec.label)))
+        for index, rxn in enumerate(network.pathReactions):
+            if 'delete_path_reaction_{0}'.format(index+1) in request.POST:
+                return HttpResponseRedirect(reverse(networkDeletePathReaction,args=(networkModel.pk,index)))
     
     # Get file sizes of files in 
     filesize = {}; modificationTime = {}
@@ -95,8 +108,6 @@ def networkIndex(request, networkKey):
         filesize['surfaceFileSVG'] = '{0:.1f}'.format(os.path.getsize(networkModel.getSurfaceFilenameSVG()))
         modificationTime['surfaceFileSVG'] = time.ctime(os.path.getmtime(networkModel.getSurfaceFilenameSVG()))
     
-    network = networkModel.load()
-        
     # Get species information
     speciesList = []
     if network is not None:
