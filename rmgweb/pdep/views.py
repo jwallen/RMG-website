@@ -171,6 +171,9 @@ def networkEditor(request, networkKey):
     if request.method == 'POST':
         form = EditNetworkForm(request.POST, instance=network)
         if form.is_valid():
+            # Delete the current input and output files
+            network.deleteInputFile()
+            network.deleteOutputFile()
             # Save the inputText field contents to the input file
             network.saveInputText()
             # Save the form
@@ -193,8 +196,9 @@ def networkUpload(request, networkKey):
     if request.method == 'POST':
         form = UploadNetworkForm(request.POST, request.FILES, instance=network)
         if form.is_valid():
-            # Delete the current input file
+            # Delete the current input and output files
             network.deleteInputFile()
+            network.deleteOutputFile()
             # Save the form
             network = form.save()
             # Load the text from the input file into the inputText field
