@@ -291,3 +291,12 @@ class Network(models.Model):
         
         return self.measure.network
     
+    def saveFile(self):
+        """
+        Save the contents of the input and output files into a MEASURE object.
+        """
+        self.measure.saveInput(self.getInputFilename())
+        if len(self.measure.network.pathReactions) > 0:
+            self.measure.saveOutput(self.getOutputFilename())
+        
+    

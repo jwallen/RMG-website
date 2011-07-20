@@ -631,3 +631,30 @@ def networkPlotMicro(request, networkKey):
         }, 
         context_instance=RequestContext(request),
     )
+def networkDeleteSpecies(request, networkKey, species):
+    """
+    A view that causes a species to be deleted from a Network.
+    """
+    networkModel = get_object_or_404(Network, pk=networkKey)
+    network = networkModel.load()
+    
+    label = species
+    for spec in network.getAllSpecies():
+        if spec.label == label:
+            species = spec
+            break
+    else:
+        raise Http404
+    
+    if request.method == 'POST':
+        if 'yes' in request.POST:
+            # Delete the species (no undo!)
+            # This also deletes any path and net reactions the species is in
+            network.deleteSpecies(species)
+            networkModel.saveFile()
+        if 'yes' in request.POST or 'no' in request.POST:
+            # Go back to the network's main page
+            return HttpResponseRedirect(reverse(networkIndex,args=(networkModel.pk,)))
+        
+    return render_to_response('networkDeleteSpecies.html', {'network': network, 'networkKey': networkKey, 'species': species}, context_instance=RequestContext(request))
+
